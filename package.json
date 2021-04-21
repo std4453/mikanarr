@@ -1,12 +1,12 @@
 {
   "name": "mikanarr",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Mikanarr, bridge between Mikan Anime and Sonarr",
+  "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "run-p dev:server dev:web",
-    "dev:server": "nodemon --signal SIGINT -e js server/index.js",
+    "dev:server": "nodemon --signal SIGINT --watch server server/index.js",
     "dev:web": "react-scripts start",
     "build": "npm-run-all build:web",
     "build:web": "react-scripts build"
