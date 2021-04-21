@@ -88,10 +88,6 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 
 ## 其他
 
-### 数据文件
-
-为了方便使用
-
 ### 部署
 
 你可以使用 [Docker](https://www.docker.com/) 进行部署，然而由于前端项目难以脱离敏感信息进行构建，我们暂不提供公用的 Docker Image 。
