@@ -7,14 +7,17 @@ const xml2js = require("xml2js");
 const parser = new xml2js.Parser();
 const builder = new xml2js.Builder();
 const axios = require("axios");
+const qs = require("qs");
 const route = async (req, res) => {
   try {
-    const { data: xmlStr } = await axios.get(`https://mikanani.me/RSS/Classic`);
+    const { data: xmlStr } = await axios.get(
+      `https://mikanani.me${req.path}?${qs.stringify(req.query)}`
+    );
     const result = await parser.parseStringPromise(xmlStr);
 
     // pre-compile
     const { data: database } = await axios.get(
-      `http://${config.host}:${config.port}/patterns`
+      `http://${config.host}:${config.port}/api/patterns`
     );
     const rules = database.map(({ pattern, ...rest }) => ({
       pattern: new RegExp(pattern, "g"),
@@ -60,7 +63,7 @@ const middlewares = jsonServer.defaults({
 });
 
 server.use(middlewares);
-server.get("/rss", route);
+server.get("/RSS/*", route);
 server.use("/api", router);
 server.listen(config.port, () => {
   console.log(`App started on port ${config.port}`);

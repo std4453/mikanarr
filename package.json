@@ -17,6 +17,7 @@
     "axios": "^0.21.1",
     "json-server": "^0.16.3",
     "lodash": "^4.17.21",
+    "qs": "^6.10.1",
     "ra-data-json-server": "^3.14.4",
     "react": "^17.0.2",
     "react-admin": "^3.14.4",
