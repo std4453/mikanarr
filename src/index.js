@@ -3,8 +3,6 @@ import ReactDOM from "react-dom";
 import {
   Admin,
   Resource,
-  ListGuesser,
-  EditGuesser,
   List,
   Datagrid,
   TextField,
@@ -12,8 +10,12 @@ import {
   SimpleForm,
   TextInput,
   Create,
+  FormDataConsumer,
 } from "react-admin";
 import jsonServerProvider from "ra-data-json-server";
+import { Button, InputAdornment } from "@material-ui/core";
+import { useForm, useFormState } from "react-final-form";
+import * as _ from "lodash";
 
 const dataProvider = jsonServerProvider("http://localhost:12306");
 
@@ -28,23 +30,51 @@ const PatternList = (props) => (
   </List>
 );
 
-const PatternEdit = (props) => (
-  <Edit {...props}>
-    <SimpleForm>
-      <TextInput disabled source="id" />
-      <TextInput source="pattern" />
-      <TextInput source="series" />
-      <TextInput source="season" />
-    </SimpleForm>
-  </Edit>
-);
+const EscapeButton = () => {
+  const form = useForm();
+  const formState = useFormState();
+  const escape = () =>
+    form.change("pattern", _.escapeRegExp(formState.values.pattern));
+  return (
+    <InputAdornment position="end">
+      <Button color="primary" onClick={escape}>
+        Escape
+      </Button>
+    </InputAdornment>
+  );
+};
+
+const PatternEdit = (props) => {
+  return (
+    <Edit {...props}>
+      <SimpleForm>
+        <TextInput disabled source="id" />
+        <TextInput
+          fullWidth
+          source="pattern"
+          InputProps={{
+            endAdornment: <EscapeButton />,
+          }}
+        />
+        <TextInput fullWidth source="series" />
+        <TextInput source="season" />
+      </SimpleForm>
+    </Edit>
+  );
+};
 
 const PatternCreate = (props) => (
   <Create {...props}>
     <SimpleForm>
       <TextInput disabled source="id" />
-      <TextInput source="pattern" />
-      <TextInput source="series" />
+      <TextInput
+        fullWidth
+        source="pattern"
+        InputProps={{
+          endAdornment: <EscapeButton />,
+        }}
+      />
+      <TextInput fullWidth source="series" />
       <TextInput source="season" />
     </SimpleForm>
   </Create>
@@ -65,4 +95,4 @@ const App = () => (
 
 export default App;
 
-ReactDOM.render(<App/>, document.querySelector("#root"));
+ReactDOM.render(<App />, document.querySelector("#root"));
