@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import {
   Admin,
@@ -11,6 +11,10 @@ import {
   TextInput,
   Create,
   FormDataConsumer,
+  AutocompleteInput,
+  fetchStart,
+  fetchEnd,
+  useNotify,
 } from "react-admin";
 import jsonServerProvider from "ra-data-json-server";
 import { Button, InputAdornment } from "@material-ui/core";
@@ -44,7 +48,31 @@ const EscapeButton = () => {
   );
 };
 
+const useSeriesChoices = () => {
+  const [choices, setChoices] = useState([]);
+  const notify = useNotify();
+  useEffect(() => {
+    (async () => {
+      try {
+        fetchStart();
+        const resp = await fetch(
+          `${process.env.REACT_APP_SONARR_API_ROOT}/series?apikey=${process.env.REACT_APP_SONARR_API_KEY}`
+        );
+        const data = await resp.json();
+        setChoices(data.map(({ title }) => ({ id: title, name: title })));
+      } catch (e) {
+        console.error(e);
+        notify(`Fetch Sonarr series failed: ${e.message}`);
+      } finally {
+        fetchEnd();
+      }
+    })();
+  }, []);
+  return choices;
+};
+
 const PatternEdit = (props) => {
+  const choices = useSeriesChoices();
   return (
     <Edit {...props}>
       <SimpleForm>
@@ -56,29 +84,32 @@ const PatternEdit = (props) => {
             endAdornment: <EscapeButton />,
           }}
         />
-        <TextInput fullWidth source="series" />
+        <AutocompleteInput fullWidth source="series" choices={choices} />
         <TextInput source="season" />
       </SimpleForm>
     </Edit>
   );
 };
 
-const PatternCreate = (props) => (
-  <Create {...props}>
-    <SimpleForm>
-      <TextInput disabled source="id" />
-      <TextInput
-        fullWidth
-        source="pattern"
-        InputProps={{
-          endAdornment: <EscapeButton />,
-        }}
-      />
-      <TextInput fullWidth source="series" />
-      <TextInput source="season" />
-    </SimpleForm>
-  </Create>
-);
+const PatternCreate = (props) => {
+  const choices = [];
+  return (
+    <Create {...props}>
+      <SimpleForm>
+        <TextInput disabled source="id" />
+        <TextInput
+          fullWidth
+          source="pattern"
+          InputProps={{
+            endAdornment: <EscapeButton />,
+          }}
+        />
+        <AutocompleteInput fullWidth source="series" choices={choices} />
+        <TextInput source="season" />
+      </SimpleForm>
+    </Create>
+  );
+};
 
 const App = () => (
   <React.StrictMode>
