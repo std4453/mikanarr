@@ -41,5 +41,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://sonarr.std4453.com:444"
+  "proxy": "http://localhost:12306"
 }

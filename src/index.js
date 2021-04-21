@@ -23,9 +23,7 @@ import * as _ from "lodash";
 import useSWR from "swr";
 import axios from "axios";
 
-const dataProvider = jsonServerProvider(
-  process.env.REACT_APP_MIKANARR_API_ROOT
-);
+const dataProvider = jsonServerProvider(new URL("/", location.href).href);
 
 const PatternList = (props) => (
   <List {...props}>
