@@ -13,7 +13,7 @@ const route = async (req, res) => {
     const result = await parser.parseStringPromise(xmlStr);
 
     // pre-compile
-    const database = router.db.get("patterns").value();
+    const database = db.get("patterns").value();
     const rules = database.map(({ pattern, ...rest }) => ({
       pattern: new RegExp(pattern, "g"),
       ...rest,
@@ -75,9 +75,16 @@ const proxy = async (req, res) => {
   }
 };
 
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
+const adapter = new FileSync("data/database.json");
+const db = low(adapter);
+
+db.defaults({ patterns: [] }).write();
+
 const jsonServer = require("json-server");
 const server = jsonServer.create();
-const router = jsonServer.router("data/database.json");
+const router = jsonServer.router(db);
 const middlewares = jsonServer.defaults({
   static: "./build",
 });
