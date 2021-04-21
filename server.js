@@ -61,7 +61,7 @@ const middlewares = jsonServer.defaults({
 
 server.use(middlewares);
 server.get("/rss", route);
-server.use(router);
+server.use("/api", router);
 server.listen(config.port, () => {
   console.log(`App started on port ${config.port}`);
 });

@@ -23,7 +23,7 @@ import * as _ from "lodash";
 import useSWR from "swr";
 import axios from "axios";
 
-const dataProvider = jsonServerProvider(new URL("/", location.href).href);
+const dataProvider = jsonServerProvider(new URL("/api", location.href).href);
 
 const PatternList = (props) => (
   <List {...props}>
