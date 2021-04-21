@@ -4,7 +4,7 @@
   "description": "Mikanarr, bridge between Mikan Anime and Sonarr",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "dotenv node server/index.js",
     "dev": "run-p dev:server dev:web",
     "dev:server": "dotenv -- nodemon --signal SIGINT --watch server server/index.js",
     "dev:web": "react-scripts start",
