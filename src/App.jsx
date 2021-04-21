@@ -12,6 +12,8 @@ const PatternList = (props) => (
       <TextField source="pattern" />
       <TextField source="series" />
       <TextField source="season" />
+      <TextField source="language" />
+      <TextField source="quality" />
     </Datagrid>
   </List>
 );
