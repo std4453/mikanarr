@@ -39,7 +39,7 @@ const choicesFetcher = async (api) => {
 const useSeriesChoices = () => {
   const notify = useNotify();
   const { data: choices } = useSWR("/series", choicesFetcher, {
-    onError: (err) => {
+    onError: (e) => {
       console.error(e);
       notify(`Fetch Sonarr series failed: ${e.message}`);
     },

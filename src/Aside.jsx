@@ -38,9 +38,13 @@ const Aside = () => {
       store.set("url_history", newHistory);
     }
   };
-  const { data } = useSWR(url, fetcher);
   const clipboard = useClipboard();
   const notify = useNotify();
+  const { data } = useSWR(url, fetcher, {
+    onError: (e, url) => {
+      notify(`Unable to fetch proxy for '${url}': ${e.message}`);
+    }
+  });
 
   return (
     <Card style={{ marginLeft: 20 }}>

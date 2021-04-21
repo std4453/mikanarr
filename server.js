@@ -42,10 +42,12 @@ const route = async (req, res) => {
           pubDate,
           enclosure,
           link,
-          guid: [{
-            $: { isPermaLink: true },
-            _: link[0],
-          }],
+          guid: [
+            {
+              $: { isPermaLink: true },
+              _: link[0],
+            },
+          ],
         });
         break;
       }
@@ -60,11 +62,17 @@ const route = async (req, res) => {
 };
 
 const proxy = async (req, res) => {
+  if (!req?.query?.url?.startsWith("https://mikanani.me")) {
+    res.status(400).send("Bad Request");
+    return;
+  }
   try {
-     const { data: xmlStr } = await axios.get(req.query.url);
-     const result = await parser.parseStringPromise(xmlStr);
-     const titles = result.rss.channel[0].item.map(({ title: [title] }) => title);
-     res.send(titles);
+    const { data: xmlStr } = await axios.get(req.query.url);
+    const result = await parser.parseStringPromise(xmlStr);
+    const titles = result.rss.channel[0].item.map(
+      ({ title: [title] }) => title
+    );
+    res.send(titles);
   } catch (e) {
     console.error(e);
     res.status(500).send("Internal Server Error");
