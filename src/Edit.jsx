@@ -30,9 +30,7 @@ const EscapeButton = () => {
 };
 
 const choicesFetcher = async (api) => {
-  const { data } = await axios(
-    `${process.env.REACT_APP_SONARR_API_ROOT}${api}?apikey=${process.env.REACT_APP_SONARR_API_KEY}`
-  );
+  const { data } = await axios(`/sonarr${api}`);
   return data.map(({ title }) => ({ id: title, name: title }));
 };
 

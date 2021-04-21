@@ -1,4 +1,18 @@
-const port = parseInt(process.env.PORT || '12306');
+require("dotenv").config();
+
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
+const adapter = new FileSync("data/database.json");
+const db = low(adapter);
+db.defaults({ patterns: [] }).write();
+
+const jsonServer = require("json-server");
+const server = jsonServer.create();
+const router = jsonServer.router(db);
+const middlewares = jsonServer.defaults({
+  static: "./build",
+});
+server.use(middlewares);
 
 const xml2js = require("xml2js");
 const parser = new xml2js.Parser();
@@ -55,8 +69,9 @@ const route = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+server.get("/RSS/*", route);
 
-const proxy = async (req, res) => {
+server.get("/proxy", async (req, res) => {
   // proxy only requests to mikan anime to prevent attacks
   if (!req?.query?.url?.startsWith("https://mikanani.me")) {
     res.status(403).send("Forbidden");
@@ -73,26 +88,26 @@ const proxy = async (req, res) => {
     console.error(e);
     res.status(500).send("Internal Server Error");
   }
-};
-
-const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
-const adapter = new FileSync("data/database.json");
-const db = low(adapter);
-
-db.defaults({ patterns: [] }).write();
-
-const jsonServer = require("json-server");
-const server = jsonServer.create();
-const router = jsonServer.router(db);
-const middlewares = jsonServer.defaults({
-  static: "./build",
 });
 
-server.use(middlewares);
-server.get("/RSS/*", route);
-server.get("/proxy", proxy);
+const { createProxyMiddleware } = require("http-proxy-middleware");
+server.use(
+  "/sonarr",
+  createProxyMiddleware({
+    target: process.env.SONARR_HOST,
+    pathRewrite(path, req) {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      url.searchParams.append("apikey", process.env.SONARR_API_KEY);
+      url.pathname = url.pathname.replace(/^\/sonarr/, "/api");
+      return `${url.pathname}${url.search}`;
+    },
+    changeOrigin: true,
+  })
+);
+
 server.use("/api", router);
+
+const port = parseInt(process.env.PORT || "12306");
 server.listen(port, () => {
   console.log(`App started on port ${port}`);
 });
