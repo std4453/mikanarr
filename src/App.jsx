@@ -26,7 +26,7 @@ const App = () => (
         shouldRetryOnError: false,
       }}
     >
-      <Admin dataProvider={dataProvider}>
+      <Admin dataProvider={dataProvider} disableTelemetry>
         <Resource
           name="patterns"
           list={PatternList}
