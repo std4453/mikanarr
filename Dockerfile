@@ -7,4 +7,5 @@ RUN yarn
 COPY build ./build
 COPY server ./server
 EXPOSE 12306
+VOLUME /usr/src/app/data
 CMD ["yarn", "start"]
