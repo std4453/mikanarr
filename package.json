@@ -8,7 +8,7 @@
     "dev": "run-p dev:server dev:web",
     "dev:server": "dotenv -- nodemon --signal SIGINT --watch server server/index.js",
     "dev:web": "react-scripts start",
-    "build": "npm-run-all build:web",
+    "build": "npm-run-all build:*",
     "build:web": "react-scripts build"
   },
   "keywords": [],
