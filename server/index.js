@@ -1,7 +1,4 @@
-const config = {
-  port: 12306,
-  host: "127.0.0.1",
-};
+const port = parseInt(process.env.PORT || '12306');
 
 const xml2js = require("xml2js");
 const parser = new xml2js.Parser();
@@ -16,9 +13,7 @@ const route = async (req, res) => {
     const result = await parser.parseStringPromise(xmlStr);
 
     // pre-compile
-    const { data: database } = await axios.get(
-      `http://${config.host}:${config.port}/api/patterns`
-    );
+    const database = router.db.get("patterns").value();
     const rules = database.map(({ pattern, ...rest }) => ({
       pattern: new RegExp(pattern, "g"),
       ...rest,
@@ -91,6 +86,6 @@ server.use(middlewares);
 server.get("/RSS/*", route);
 server.get("/proxy", proxy);
 server.use("/api", router);
-server.listen(config.port, () => {
-  console.log(`App started on port ${config.port}`);
+server.listen(port, () => {
+  console.log(`App started on port ${port}`);
 });
