@@ -2,3 +2,4 @@
 /data/
 /build/
 .env
+docker-compose.yml
