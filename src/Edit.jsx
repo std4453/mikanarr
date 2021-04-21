@@ -12,6 +12,7 @@ import {
 } from "react-admin";
 import { useForm, useFormState } from "react-final-form";
 import useSWR from "swr";
+import { useClipboard } from "use-clipboard-copy";
 import Aside from "./Aside";
 
 const EscapeButton = () => {
@@ -68,17 +69,23 @@ const PatternEdit = (props) => {
   );
 };
 
+const patternDefaultValue = () => ({ language: 'Chinese', quality: 'WEBDL 1080p' });
+
 const PatternCreate = (props) => {
+  const clipboard = useClipboard();
   const choices = useSeriesChoices();
   return (
     <Create {...props} aside={<Aside />}>
-      <SimpleForm>
+      <SimpleForm initialValues={patternDefaultValue}>
         <TextInput disabled source="id" />
         <TextInput
           fullWidth
           source="pattern"
           InputProps={{
-            endAdornment: <EscapeButton />,
+            endAdornment: <>
+              <EscapeButton />,
+              <Button color="primary" onClick={() => clipboard.copy('(?<episode>\\d+)')}>Episode</Button>
+            </>
           }}
         />
         <AutocompleteInput fullWidth source="series" choices={choices} />

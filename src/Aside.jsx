@@ -14,6 +14,8 @@ import useSWR from "swr";
 import axios from "axios";
 import { useClipboard } from "use-clipboard-copy";
 import { useNotify } from "ra-core";
+import { Autocomplete } from "@material-ui/lab";
+import store from "store";
 
 const fetcher = async (url) => {
   const { data } = await axios.get(
@@ -23,10 +25,16 @@ const fetcher = async (url) => {
 };
 
 const Aside = () => {
+  const [history, setHistory] = useState(store.get('url_history') ?? []);
   const { control, handleSubmit } = useForm();
   const [url, setUrl] = useState(null);
   const onSubmit = (data) => {
     setUrl(data.url);
+    let newHistory = history.map(url => url !== data.url);
+    newHistory.push(data.url);
+    newHistory = newHistory.slice(0, 20);
+    setHistory(newHistory);
+    store.set('url_history', newHistory);
   };
   const { data } = useSWR(url, fetcher);
   const clipboard = useClipboard();
@@ -43,8 +51,19 @@ const Aside = () => {
                   name="url"
                   control={control}
                   defaultValue=""
-                  render={({ field }) => (
-                    <TextField fullWidth placeholder="URL" {...field} />
+                  render={({ field: { value, name, ref, onBlur, onChange } }) => (
+                    <Autocomplete
+                      freeSolo
+                      name={name}
+                      ref={ref}
+                      onBlur={onBlur}
+                      inputValue={value}
+                      onInputChange={(event, value) => onChange({ target: { value } })}
+                      options={history}
+                      renderInput={(params) => (
+                        <TextField fullWidth placeholder="URL" {...params} />
+                      )}
+                    />
                   )}
                 />
               </Grid>
@@ -73,7 +92,7 @@ const Aside = () => {
                     divider
                     onClick={() => {
                       clipboard.copy(title);
-                      notify('Title copied');
+                      notify("Title copied");
                     }}
                   >
                     <ListItemText primary={title} />
