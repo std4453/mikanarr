@@ -20,6 +20,8 @@ import jsonServerProvider from "ra-data-json-server";
 import { Button, InputAdornment } from "@material-ui/core";
 import { useForm, useFormState } from "react-final-form";
 import * as _ from "lodash";
+import useSWR from "swr";
+import axios from "axios";
 
 const dataProvider = jsonServerProvider("http://localhost:12306");
 
@@ -48,26 +50,21 @@ const EscapeButton = () => {
   );
 };
 
+const choicesFetcher = async (api) => {
+  const { data } = await axios(
+    `${process.env.REACT_APP_SONARR_API_ROOT}${api}?apikey=${process.env.REACT_APP_SONARR_API_KEY}`
+  );
+  return data.map(({ title }) => ({ id: title, name: title }));
+}
+
 const useSeriesChoices = () => {
-  const [choices, setChoices] = useState([]);
   const notify = useNotify();
-  useEffect(() => {
-    (async () => {
-      try {
-        fetchStart();
-        const resp = await fetch(
-          `${process.env.REACT_APP_SONARR_API_ROOT}/series?apikey=${process.env.REACT_APP_SONARR_API_KEY}`
-        );
-        const data = await resp.json();
-        setChoices(data.map(({ title }) => ({ id: title, name: title })));
-      } catch (e) {
-        console.error(e);
-        notify(`Fetch Sonarr series failed: ${e.message}`);
-      } finally {
-        fetchEnd();
-      }
-    })();
-  }, []);
+  const { data: choices } = useSWR('/series', choicesFetcher, {
+    onError: (err) => {
+      console.error(e);
+      notify(`Fetch Sonarr series failed: ${e.message}`);
+    }
+  });
   return choices;
 };
 
@@ -92,7 +89,7 @@ const PatternEdit = (props) => {
 };
 
 const PatternCreate = (props) => {
-  const choices = [];
+  const choices = useSeriesChoices();
   return (
     <Create {...props}>
       <SimpleForm>
