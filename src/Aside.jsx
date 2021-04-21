@@ -25,16 +25,18 @@ const fetcher = async (url) => {
 };
 
 const Aside = () => {
-  const [history, setHistory] = useState(store.get('url_history') ?? []);
+  const [history, setHistory] = useState(store.get("url_history") ?? []);
   const { control, handleSubmit } = useForm();
   const [url, setUrl] = useState(null);
   const onSubmit = (data) => {
     setUrl(data.url);
-    let newHistory = history.map(url => url !== data.url);
-    newHistory.push(data.url);
-    newHistory = newHistory.slice(0, 20);
-    setHistory(newHistory);
-    store.set('url_history', newHistory);
+    if (data.url) {
+      let newHistory = history.filter((url) => url !== data.url);
+      newHistory.push(data.url);
+      newHistory = newHistory.slice(0, 20);
+      setHistory(newHistory);
+      store.set("url_history", newHistory);
+    }
   };
   const { data } = useSWR(url, fetcher);
   const clipboard = useClipboard();
@@ -51,14 +53,18 @@ const Aside = () => {
                   name="url"
                   control={control}
                   defaultValue=""
-                  render={({ field: { value, name, ref, onBlur, onChange } }) => (
+                  render={({
+                    field: { value, name, ref, onBlur, onChange },
+                  }) => (
                     <Autocomplete
                       freeSolo
                       name={name}
                       ref={ref}
                       onBlur={onBlur}
                       inputValue={value}
-                      onInputChange={(event, value) => onChange({ target: { value } })}
+                      onInputChange={(event, value) =>
+                        onChange({ target: { value } })
+                      }
                       options={history}
                       renderInput={(params) => (
                         <TextField fullWidth placeholder="URL" {...params} />
