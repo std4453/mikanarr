@@ -19,8 +19,8 @@
 接着，创建并填写 `.env` 文件，如：
 
 ```env
-REACT_APP_SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
-REACT_APP_SONARR_API_ROOT=https://sonarr.yourdomain.com/api
+SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
+SONARR_API_ROOT=https://sonarr.yourdomain.com/api
 ```
 
 然后运行（需要 Node.js 环境）：
@@ -90,11 +90,13 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 
 ### 部署
 
-你可以使用 [Docker](https://www.docker.com/) 进行部署，然而由于前端项目难以脱离敏感信息进行构建，我们暂不提供公用的 Docker Image 。
+你可以使用 [Docker](https://www.docker.com/) 进行部署，我们的 Docker Image 在 [`std4453/mikanarr`](#TBA) 。
 
-你可以使用 [`build_docker.sh`](build_docker.sh) 在本地构建 Docker Image （需要事先填写 `.env` 文件），用该 Image 进行部署。
+你也可以使用 [`build_docker.sh`](build_docker.sh) 自行构建 Docker Image。
 
 注意，为了在中国网络环境中进行构建，我们的 `yarn.lock` 中使用 [淘宝 npm 镜像](https://npm.taobao.org/mirrors/) 作为包的地址，你可能需要使用其他的镜像。
+
+构建得到的镜像不包含 `.env` 文件，你需要在 `docker run` 的时候指定对应的环境变量。
 
 此外，数据文件不应包含在 Docker Image 和 Docker Container 中，你应当从宿主机将数据文件夹 `data/` 挂载到容器中的 `/usr/app/data` 。
 
@@ -108,17 +110,21 @@ services:
     image: <your scope>/mikanarr
     volumes:
       - ./data:/usr/src/app/data
+    env_file: .env
     restart: unless-stopped
 ```
+
+这会使用同一份 `.env` 文件启动应用。
 
 ### 安全
 
 - `/RSS` 开头的路径会用于转换 RSS 推送。
 - `/proxy` 用于允许前端请求 Mikan Anime 的 RSS 推送地址，仅允许请求 `https://mikanani.me` 域名下的 URL 。
+- `/sonarr` 用于反代对 Sonarr API 的请求，避免客户端保存 API Key 。
 - `/api` 开头的路径用于访问和操作数据。
 - 其他地址会得到 `build/` 下的对应静态文件，未找到则会得到 `index.html` 。由于前端使用了 Hash Router ，所有前端 HTML 请求应当仅访问 `/` 路径。
 
-考虑到实现的简单性，我们并没有对服务器进行访问控制，你可以基于上面的描述自行添加访问控制，比如 [HTTP Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) 。其中 `/RSS` 下的路径需要由 Sonarr 访问，且不会直接暴露用户数据，可以考虑不进行访问控制。
+考虑到实现的简单性，我们并没有对服务器进行访问控制，你可以基于上面的描述自行添加访问控制，比如 [HTTP Basic Auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) 。其中 `/RSS` 下的路径需要由 Sonarr 访问，无法使用 HTTP Auth ，且不会直接暴露用户数据，可以考虑不进行访问控制。
 
 ### 开发
 
@@ -129,15 +135,15 @@ services:
 ```
 src/
 public/
-build/ （构建得到）
-.env
+build/   （构建得到）
 ```
 
 以下文件仅为后端代码使用：
 
 ```
-server/
-data/ （数据文件）
+server/  
+data/   （数据文件）
+.env    （配置文件）
 ```
 
 进行前端开发时，你可以使用 `yarn dev:web` ，它使用 `react-scripts dev` 在本地启动一个 Dev Server 。
