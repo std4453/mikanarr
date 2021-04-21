@@ -48,6 +48,8 @@ const useSeriesChoices = () => {
 };
 
 const PatternEdit = (props) => {
+  const clipboard = useClipboard();
+  const notify = useNotify();
   const choices = useSeriesChoices();
   return (
     <Edit {...props} aside={<Aside />}>
@@ -57,7 +59,20 @@ const PatternEdit = (props) => {
           fullWidth
           source="pattern"
           InputProps={{
-            endAdornment: <EscapeButton />,
+            endAdornment: (
+              <>
+                <EscapeButton />
+                <Button
+                  color="primary"
+                  onClick={() => {
+                    clipboard.copy("(?<episode>\\d+)");
+                    notify("Episode pattern copied");
+                  }}
+                >
+                  Episode
+                </Button>
+              </>
+            ),
           }}
         />
         <AutocompleteInput fullWidth source="series" choices={choices} />
@@ -73,6 +88,7 @@ const patternDefaultValue = () => ({ language: 'Chinese', quality: 'WEBDL 1080p'
 
 const PatternCreate = (props) => {
   const clipboard = useClipboard();
+  const notify = useNotify();
   const choices = useSeriesChoices();
   return (
     <Create {...props} aside={<Aside />}>
@@ -83,8 +99,11 @@ const PatternCreate = (props) => {
           source="pattern"
           InputProps={{
             endAdornment: <>
-              <EscapeButton />,
-              <Button color="primary" onClick={() => clipboard.copy('(?<episode>\\d+)')}>Episode</Button>
+              <EscapeButton />
+              <Button color="primary" onClick={() => {
+                clipboard.copy('(?<episode>\\d+)');
+                notify('Episode pattern copied');
+              }}>Episode</Button>
             </>
           }}
         />
