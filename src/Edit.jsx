@@ -12,6 +12,7 @@ import {
 } from "react-admin";
 import { useForm, useFormState } from "react-final-form";
 import useSWR from "swr";
+import Aside from "./Aside";
 
 const EscapeButton = () => {
   const form = useForm();
@@ -48,7 +49,7 @@ const useSeriesChoices = () => {
 const PatternEdit = (props) => {
   const choices = useSeriesChoices();
   return (
-    <Edit {...props}>
+    <Edit {...props} aside={<Aside/>}>
       <SimpleForm>
         <TextInput disabled source="id" />
         <TextInput

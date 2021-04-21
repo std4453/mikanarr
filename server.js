@@ -55,6 +55,18 @@ const route = async (req, res) => {
   }
 };
 
+const proxy = async (req, res) => {
+  try {
+     const { data: xmlStr } = await axios.get(req.query.url);
+     const result = await parser.parseStringPromise(xmlStr);
+     const titles = result.rss.channel[0].item.map(({ title: [title] }) => title);
+     res.send(titles);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 const jsonServer = require("json-server");
 const server = jsonServer.create();
 const router = jsonServer.router("data/database.json");
@@ -64,6 +76,7 @@ const middlewares = jsonServer.defaults({
 
 server.use(middlewares);
 server.get("/RSS/*", route);
+server.get("/proxy", proxy);
 server.use("/api", router);
 server.listen(config.port, () => {
   console.log(`App started on port ${config.port}`);
