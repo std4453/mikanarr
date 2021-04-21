@@ -36,12 +36,16 @@ const route = async (req, res) => {
         const match = pattern.exec(title);
         if (!match) continue;
         const { episode } = match.groups;
-        const normalized = `${series} - S${season}E${episode}`;
+        const normalized = `${series} - S${season}E${episode} - Chinese - WebRip 1080p`;
         items.push({
           title: [normalized],
           pubDate,
           enclosure,
           link,
+          guid: [{
+            $: { isPermaLink: true },
+            _: link[0],
+          }],
         });
         break;
       }

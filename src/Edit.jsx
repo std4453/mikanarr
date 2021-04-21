@@ -49,7 +49,7 @@ const useSeriesChoices = () => {
 const PatternEdit = (props) => {
   const choices = useSeriesChoices();
   return (
-    <Edit {...props} aside={<Aside/>}>
+    <Edit {...props} aside={<Aside />}>
       <SimpleForm>
         <TextInput disabled source="id" />
         <TextInput
@@ -69,7 +69,7 @@ const PatternEdit = (props) => {
 const PatternCreate = (props) => {
   const choices = useSeriesChoices();
   return (
-    <Create {...props}>
+    <Create {...props} aside={<Aside />}>
       <SimpleForm>
         <TextInput disabled source="id" />
         <TextInput

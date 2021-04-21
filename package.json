@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev:server": "nodemon --signal SIGINT -e js,html,json server.js",
+    "dev:server": "nodemon --signal SIGINT -e js server.js",
     "build:web": "react-scripts build",
     "dev:web": "react-scripts start"
   },
