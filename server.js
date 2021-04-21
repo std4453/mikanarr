@@ -62,8 +62,9 @@ const route = async (req, res) => {
 };
 
 const proxy = async (req, res) => {
+  // proxy only requests to mikan anime to prevent attacks
   if (!req?.query?.url?.startsWith("https://mikanani.me")) {
-    res.status(400).send("Bad Request");
+    res.status(403).send("Forbidden");
     return;
   }
   try {

@@ -18,6 +18,7 @@ import { Autocomplete } from "@material-ui/lab";
 import store from "store";
 
 const fetcher = async (url) => {
+  // use a proxy to bypass CORS
   const { data } = await axios.get(
     new URL(`/proxy?url=${encodeURIComponent(url)}`, location.href).href
   );
@@ -28,23 +29,21 @@ const Aside = () => {
   const [history, setHistory] = useState(store.get("url_history") ?? []);
   const { control, handleSubmit } = useForm();
   const [url, setUrl] = useState(null);
-  const onSubmit = (data) => {
-    setUrl(data.url);
-    if (data.url) {
-      let newHistory = history.filter((url) => url !== data.url);
-      newHistory.push(data.url);
-      newHistory = newHistory.slice(0, 20);
-      setHistory(newHistory);
-      store.set("url_history", newHistory);
-    }
-  };
   const clipboard = useClipboard();
   const notify = useNotify();
-  const { data } = useSWR(url, fetcher, {
+  const { data, revalidate } = useSWR(url, fetcher, {
     onError: (e, url) => {
       notify(`Unable to fetch proxy for '${url}': ${e.message}`);
-    }
+    },
   });
+  const onSubmit = (data) => {
+    setUrl(data.url);
+    let newHistory = history.filter((url) => url !== data.url);
+    newHistory.push(data.url);
+    newHistory = newHistory.slice(0, 20); // keep only 20 entries
+    setHistory(newHistory);
+    store.set("url_history", newHistory);
+  };
 
   return (
     <Card style={{ marginLeft: 20 }}>
