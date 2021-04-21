@@ -15,68 +15,54 @@ import {
 } from "react-admin";
 import jsonServerProvider from "ra-data-json-server";
 
-const e = React.createElement;
-
 const dataProvider = jsonServerProvider("http://localhost:12306");
 
-const PatternList = (props) =>
-  e(
-    List,
-    props,
-    e(
-      Datagrid,
-      { rowClick: "edit" },
-      e(TextField, { source: "id" }),
-      e(TextField, { source: "pattern" }),
-      e(TextField, { source: "series" }),
-      e(TextField, { source: "season" })
-    )
-  );
+const PatternList = (props) => (
+  <List {...props}>
+    <Datagrid rowClick="edit">
+      <TextField source="id" />
+      <TextField source="pattern" />
+      <TextField source="series" />
+      <TextField source="season" />
+    </Datagrid>
+  </List>
+);
 
-const PatternEdit = (props) =>
-  e(
-    Edit,
-    props,
-    e(
-      SimpleForm,
-      null,
-      e(TextInput, { disabled: true, source: "id" }),
-      e(TextInput, { source: "pattern" }),
-      e(TextInput, { source: "series" }),
-      e(TextInput, { source: "season" })
-    )
-  );
+const PatternEdit = (props) => (
+  <Edit {...props}>
+    <SimpleForm>
+      <TextInput disabled source="id" />
+      <TextInput source="pattern" />
+      <TextInput source="series" />
+      <TextInput source="season" />
+    </SimpleForm>
+  </Edit>
+);
 
-const PatternCreate = (props) =>
-  e(
-    Create,
-    props,
-    e(
-      SimpleForm,
-      null,
-      e(TextInput, { disabled: true, source: "id" }),
-      e(TextInput, { source: "pattern" }),
-      e(TextInput, { source: "series" }),
-      e(TextInput, { source: "season" })
-    )
-  );
+const PatternCreate = (props) => (
+  <Create {...props}>
+    <SimpleForm>
+      <TextInput disabled source="id" />
+      <TextInput source="pattern" />
+      <TextInput source="series" />
+      <TextInput source="season" />
+    </SimpleForm>
+  </Create>
+);
 
-const App = () =>
-  e(
-    React.StrictMode,
-    null,
-    e(
-      Admin,
-      { dataProvider },
-      e(Resource, {
-        name: "patterns",
-        list: PatternList,
-        edit: PatternEdit,
-        create: PatternCreate,
-      })
-    )
-  );
+const App = () => (
+  <React.StrictMode>
+    <Admin dataProvider={dataProvider}>
+      <Resource
+        name="patterns"
+        list={PatternList}
+        edit={PatternEdit}
+        create={PatternCreate}
+      />
+    </Admin>
+  </React.StrictMode>
+);
 
 export default App;
 
-ReactDOM.render(e(App, null, null), document.querySelector("#root"));
+ReactDOM.render(<App/>, document.querySelector("#root"));
