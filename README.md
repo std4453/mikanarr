@@ -90,7 +90,7 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 
 ### 部署
 
-你可以使用 [Docker](https://www.docker.com/) 进行部署，我们的 Docker Image 在 [`std4453/mikanarr`](#TBA) 。
+你可以使用 [Docker](https://www.docker.com/) 进行部署，我们的 Docker Image 在 [`std4453/mikanarr`](https://hub.docker.com/r/std4453/mikanarr) 。
 
 你也可以使用 [`build_docker.sh`](build_docker.sh) 自行构建 Docker Image。
 
