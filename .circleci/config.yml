@@ -11,7 +11,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            ./build-docker.sh
+            ./build_docker.sh
       - run:
           name: Push image to Docker Hub
           command: |
