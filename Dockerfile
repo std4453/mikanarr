@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY yarn.lock ./
-RUN yarn
+RUN yarn install --production=true
 COPY build ./build
 COPY server ./server
 EXPOSE 12306
