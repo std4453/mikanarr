@@ -1,0 +1,28 @@
+version: 2.1
+jobs:
+  build-and-push:
+    environment:
+      IMAGE_NAME: std4453/mikanarr
+    docker:
+      - image: circleci/node:15.9.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            ./build_docker.sh
+      - run:
+          name: Push image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push $IMAGE_NAME:latest
+workflows:
+  commit:
+    jobs:
+      - build-and-push:
+          context:
+            - docker-hub
+          filters:
+            branches:
+              only: master
