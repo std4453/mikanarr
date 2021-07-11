@@ -4,7 +4,7 @@ jobs:
     environment:
       IMAGE_NAME: std4453/mikanarr
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: circleci/node:15.9.0
     steps:
       - checkout
       - setup_remote_docker
