@@ -12,6 +12,7 @@ const middlewares = jsonServer.defaults({
 });
 server.use(middlewares);
 
+require('global-agent/bootstrap');
 const xml2js = require("xml2js");
 const parser = new xml2js.Parser();
 const builder = new xml2js.Builder();
