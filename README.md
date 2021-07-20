@@ -20,7 +20,7 @@
 
 ```env
 SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
-SONARR_API_ROOT=https://sonarr.yourdomain.com/api
+SONARR_HOST=https://sonarr.yourdomain.com/
 ```
 
 然后运行（需要 Node.js 环境）：
