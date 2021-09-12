@@ -3,6 +3,7 @@ jobs:
   build-and-push:
     environment:
       IMAGE_NAME: std4453/mikanarr
+      IMAGE_VERSION: 1.0.1
     docker:
       - image: circleci/node:15.9.0
     steps:
@@ -10,9 +11,17 @@ jobs:
       - setup_remote_docker:
           version: 19.03.13
       - run:
+          name: Instal Dependencies
+          command: yarn --frozen-lockfile
+      - run:
+          name: Build Code
+          command: yarn build
+      - run:
           name: Build Docker image
           command: |
-            ./build_docker.sh
+            docker build . \
+              -t std4453/mikanarr:latest \
+              -t std4453/mikanarr:${IMAGE_VERSION}
       - run:
           name: Push image to Docker Hub
           command: |
