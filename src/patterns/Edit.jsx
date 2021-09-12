@@ -1,11 +1,12 @@
 import { Button, InputAdornment } from "@material-ui/core";
 import axios from "axios";
 import * as _ from "lodash";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AutocompleteInput,
   Create,
   Edit,
+  SelectInput,
   SimpleForm,
   TextInput,
   useNotify,
@@ -31,24 +32,50 @@ const EscapeButton = () => {
 
 const choicesFetcher = async (api) => {
   const { data } = await axios(`/sonarr${api}`);
-  return data.map(({ title }) => ({ id: title, name: title }));
+  return data;
 };
 
-const useSeriesChoices = () => {
+const useSeries = () => {
   const notify = useNotify();
-  const { data: choices } = useSWR("/series", choicesFetcher, {
+  const { data: series } = useSWR("/series", choicesFetcher, {
+    initialData: [],
     onError: (e) => {
       console.error(e);
       notify(`Fetch Sonarr series failed: ${e.message}`);
     },
   });
-  return choices;
+  return series;
+};
+
+const SeasonsInput = ({ series }) => {
+  const state = useFormState();
+  const seriesTitle = state.values?.series;
+  const seasonChoices = useMemo(
+    () =>
+      series?.find(({ title }) => title === seriesTitle)?.seasons?.map(({ seasonNumber }) => ({
+        id: `${seasonNumber}`.padStart(2, "0"),
+        name: `${seasonNumber}`.padStart(2, "0"),
+      })),
+    [series, seriesTitle]
+  );
+
+  return <SelectInput source="season" choices={seasonChoices} />;
 };
 
 const PatternEdit = (props) => {
   const clipboard = useClipboard();
   const notify = useNotify();
-  const choices = useSeriesChoices();
+
+  const series = useSeries();
+  const choices = useMemo(
+    () =>
+      series.map(({ title }) => ({
+        id: title,
+        name: title,
+      })),
+    [series]
+  );
+
   return (
     <Edit {...props} aside={<Aside />}>
       <SimpleForm>
@@ -74,7 +101,7 @@ const PatternEdit = (props) => {
           }}
         />
         <AutocompleteInput fullWidth source="series" choices={choices} />
-        <TextInput source="season" />
+        <SeasonsInput series={series} />
         <TextInput source="language" />
         <TextInput source="quality" />
       </SimpleForm>
@@ -82,7 +109,10 @@ const PatternEdit = (props) => {
   );
 };
 
-const patternDefaultValue = () => ({ language: 'Chinese', quality: 'WEBDL 1080p' });
+const patternDefaultValue = () => ({
+  language: "Chinese",
+  quality: "WEBDL 1080p",
+});
 
 const PatternCreate = (props) => {
   const clipboard = useClipboard();
@@ -96,13 +126,20 @@ const PatternCreate = (props) => {
           fullWidth
           source="pattern"
           InputProps={{
-            endAdornment: <>
-              <EscapeButton />
-              <Button color="primary" onClick={() => {
-                clipboard.copy('(?<episode>\\d+)');
-                notify('Episode pattern copied');
-              }}>Episode</Button>
-            </>
+            endAdornment: (
+              <>
+                <EscapeButton />
+                <Button
+                  color="primary"
+                  onClick={() => {
+                    clipboard.copy("(?<episode>\\d+)");
+                    notify("Episode pattern copied");
+                  }}
+                >
+                  Episode
+                </Button>
+              </>
+            ),
           }}
         />
         <AutocompleteInput fullWidth source="series" choices={choices} />
