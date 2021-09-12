@@ -1,5 +1,6 @@
-import { Button, InputAdornment } from "@material-ui/core";
+import { Button, InputAdornment, makeStyles } from "@material-ui/core";
 import axios from "axios";
+import clsx from "clsx";
 import * as _ from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -47,19 +48,58 @@ const useSeries = () => {
   return series;
 };
 
+const useStylesSeasonChoice = makeStyles({
+  monitoring: {
+    display: "inline-block",
+    verticalAlign: "middle",
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    marginRight: 8,
+    backgroundColor: "green",
+    "&$unmonitored": {
+      backgroundColor: "red",
+    },
+  },
+  unmonitored: {},
+});
+
+const SeasonChoice = ({ record: { monitored, seasonNumber } }) => {
+  const styles = useStylesSeasonChoice();
+  return (
+    <div>
+      <div
+        className={clsx(styles.monitoring, {
+          [styles.unmonitored]: !monitored,
+        })}
+      />
+      {`${seasonNumber}`.padStart(2, "0")}{" "}
+    </div>
+  );
+};
+
 const SeasonsInput = ({ series }) => {
   const state = useFormState();
   const seriesTitle = state.values?.series;
   const seasonChoices = useMemo(
     () =>
-      series?.find(({ title }) => title === seriesTitle)?.seasons?.map(({ seasonNumber }) => ({
-        id: `${seasonNumber}`.padStart(2, "0"),
-        name: `${seasonNumber}`.padStart(2, "0"),
-      })),
+      series
+        ?.find(({ title }) => title === seriesTitle)
+        ?.seasons?.map(({ seasonNumber, monitored }) => ({
+          id: `${seasonNumber}`.padStart(2, "0"),
+          seasonNumber,
+          monitored,
+        })),
     [series, seriesTitle]
   );
 
-  return <SelectInput source="season" choices={seasonChoices} />;
+  return (
+    <SelectInput
+      source="season"
+      choices={seasonChoices}
+      optionText={<SeasonChoice />}
+    />
+  );
 };
 
 const PatternEdit = (props) => {
