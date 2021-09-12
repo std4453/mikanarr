@@ -1,6 +1,7 @@
 {
   "name": "mikanarr",
   "version": "1.0.0",
+  "private": "true",
   "description": "Mikanarr, bridge between Mikan Anime and Sonarr",
   "main": "server/index.js",
   "scripts": {
