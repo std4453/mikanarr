@@ -21,12 +21,13 @@ jobs:
           command: |
             docker build . \
               -t std4453/mikanarr:latest \
-              -t std4453/mikanarr:${IMAGE_VERSION}
+              -t std4453/mikanarr:$IMAGE_VERSION
       - run:
           name: Push image to Docker Hub
           command: |
             echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_VERSION
 workflows:
   commit:
     jobs:
