@@ -1,5 +1,7 @@
 # Mikanarr
 
+[![CircleCI](https://circleci.com/gh/std4453/mikanarr/tree/master.svg?style=svg)](https://circleci.com/gh/std4453/mikanarr/tree/master)
+
 *Mikanarr* 由 *Mikan Anime* 与 *Sonarr* 混合而成，负责打通两者之间的桥梁，作为自动下载动画的关键一步存在。
 
 关于整个媒体栈的详细信息，请参考 [我的博客](https://blog.std4453.com:444/nas-from-zero-media-part/) ，本文件仅阐述项目的使用方法。
@@ -94,8 +96,6 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 
 你也可以使用 [`build_docker.sh`](build_docker.sh) 自行构建 Docker Image。
 
-注意，为了在中国网络环境中进行构建，我们的 `yarn.lock` 中使用 [淘宝 npm 镜像](https://npm.taobao.org/mirrors/) 作为包的地址，你可能需要使用其他的镜像。
-
 构建得到的镜像不包含 `.env` 文件，你需要在 `docker run` 的时候指定对应的环境变量。
 
 此外，数据文件不应包含在 Docker Image 和 Docker Container 中，你应当从宿主机将数据文件夹 `data/` 挂载到容器中的 `/usr/app/data` 。
@@ -107,7 +107,7 @@ version: "3.9"
 
 services:
   mikanarr:
-    image: <your scope>/mikanarr
+    image: std4453/mikanarr
     volumes:
       - ./data:/usr/src/app/data
     env_file: .env
