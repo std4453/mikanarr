@@ -43,6 +43,7 @@ $ yarn start
 - `Pattern`: 标题模板，只有匹配至少一条的项目会被返回，模板本身为 [正则表达式](https://en.wikipedia.org/wiki/Regular_expression) ，表达式中需要包含 [命名捕获组](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) （即 `(?<episode>\d+)` )，用于提供剧集信息。
 - `Series`: 系列名称，网页端会从 Sonarr 获取所有系列名称，如果没有找到需要的系列，可能需要首先在 Sonarr 中添加系列。
 - `Season`: 季度代码，一般为两位数字，如 `01`。
+- `Offset`: 剧集号偏移量，用于修复从第一季开始的序号和从本季开始的序号。如`-26`。
 - `Language`: 语言，为剧集对应语言的英文名，如 `Chinese`，需要符合系列所需的语言设定，否则无法被 Sonarr 抓取。
 - `Quality`: 质量，可用的值可以参考 [Sonarr 源码](https://github.com/Sonarr/Sonarr/blob/develop/src/NzbDrone.Core/Parser/QualityParser.cs) ，Sonarr 似乎不支持对 RSS 推送的项目自动检测质量，网页端默认填写的值为 `WEBDL 1080p`。
 

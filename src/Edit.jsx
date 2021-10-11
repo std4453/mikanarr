@@ -75,6 +75,7 @@ const PatternEdit = (props) => {
         />
         <AutocompleteInput fullWidth source="series" choices={choices} />
         <TextInput source="season" />
+        <TextInput source="offset" />
         <TextInput source="language" />
         <TextInput source="quality" />
       </SimpleForm>
@@ -107,6 +108,7 @@ const PatternCreate = (props) => {
         />
         <AutocompleteInput fullWidth source="series" choices={choices} />
         <TextInput source="season" />
+        <TextInput source="offset" />
         <TextInput source="language" />
         <TextInput source="quality" />
       </SimpleForm>

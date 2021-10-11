@@ -40,11 +40,12 @@ const route = async (req, res) => {
         link,
         torrent: [{ pubDate }],
       } = item;
-      for (const { pattern, series, season, language, quality } of rules) {
+      for (const { pattern, series, season, language, quality, offset } of rules) {
         const match = pattern.exec(title);
         if (!match) continue;
         const { episode } = match.groups;
-        const normalized = `${series} - S${season}E${episode} - ${language} - ${quality}`;
+        const episodeWithOffset = Number.parseInt(episode) + (Number.parseInt(offset) || 0);
+        const normalized = `${series} - S${season}E${episodeWithOffset} - ${language} - ${quality}`;
         items.push({
           title: [normalized],
           pubDate,
