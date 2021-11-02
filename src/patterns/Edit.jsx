@@ -39,7 +39,7 @@ const choicesFetcher = async (api) => {
 const useSeries = () => {
   const notify = useNotify();
   const { data: series } = useSWR("/series", choicesFetcher, {
-    initialData: [],
+    fallbackData: [],
     onError: (e) => {
       console.error(e);
       notify(`Fetch Sonarr series failed: ${e.message}`);
@@ -157,7 +157,15 @@ const patternDefaultValue = () => ({
 const PatternCreate = (props) => {
   const clipboard = useClipboard();
   const notify = useNotify();
-  const choices = useSeriesChoices();
+  const series = useSeries();
+  const choices = useMemo(
+    () =>
+      series.map(({ title }) => ({
+        id: title,
+        name: title,
+      })),
+    [series]
+  );
   return (
     <Create {...props} aside={<Aside />}>
       <SimpleForm initialValues={patternDefaultValue}>
