@@ -1,10 +1,9 @@
-import jsonServerProvider from "ra-data-json-server";
 import React from "react";
 import { Admin } from "react-admin";
 import { SWRConfig } from "swr";
+import authProvider from "./auth";
+import dataProvider from "./data";
 import patternResource from "./patterns";
-
-const dataProvider = jsonServerProvider(new URL("/api", location.href).href);
 
 const App = () => (
   <React.StrictMode>
@@ -13,7 +12,11 @@ const App = () => (
         shouldRetryOnError: false,
       }}
     >
-      <Admin dataProvider={dataProvider} disableTelemetry>
+      <Admin
+        dataProvider={dataProvider}
+        authProvider={authProvider}
+        disableTelemetry
+      >
         {patternResource}
       </Admin>
     </SWRConfig>
