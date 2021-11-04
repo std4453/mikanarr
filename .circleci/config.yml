@@ -3,7 +3,7 @@ jobs:
   build-and-push:
     environment:
       IMAGE_NAME: std4453/mikanarr
-      IMAGE_VERSION: 1.1.0
+      IMAGE_VERSION: 1.1.1
     docker:
       - image: circleci/node:15.9.0
     steps:
