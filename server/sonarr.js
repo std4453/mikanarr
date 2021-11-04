@@ -1,8 +1,11 @@
 const server = require('./server');
 
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const middlewares = require('./jwt');
+
 server.use(
   "/sonarr",
+  ...middlewares,
   createProxyMiddleware({
     target: process.env.SONARR_HOST,
     pathRewrite(path, req) {
