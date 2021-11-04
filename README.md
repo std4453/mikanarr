@@ -23,7 +23,14 @@
 ```env
 SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
 SONARR_API_ROOT=https://sonarr.yourdomain.com/api
+REACT_APP_MIKANARR_PATH=https://your_mikanarr_host/
+ADMIN_USERNAME=mikanarr
+ADMIN_PASSWORD=your_admin_password
 ```
+
+这里的 `REACT_APP_MIKANARR_PATH` 应当填写你实际的部署地址，用于生成本地 RSS feed 的地址。
+
+`ADMIN_USERNAME` 和 `ADMIN_PASSWORD` 用于登陆系统，未登陆无法访问。
 
 然后运行（需要 Node.js 环境）：
 
@@ -38,15 +45,16 @@ $ yarn start
 
 ![Mikanarr 网页端截图](images/screenshot1.png)
 
-在网页中，你可以添加、删除、编辑条目，主要需要填写的字段包括：
+在网页中，你可以搜索、排序、添加、删除、编辑条目，主要需要填写的字段包括：
 
+- `Remote`: 远程地址，即 Mikan Anime 中对应剧集 （可以包含字幕组） 的 RSS 推送地址，选填。
 - `Pattern`: 标题模板，只有匹配至少一条的项目会被返回，模板本身为 [正则表达式](https://en.wikipedia.org/wiki/Regular_expression) ，表达式中需要包含 [命名捕获组](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) （即 `(?<episode>\d+)` )，用于提供剧集信息。
 - `Series`: 系列名称，网页端会从 Sonarr 获取所有系列名称，如果没有找到需要的系列，可能需要首先在 Sonarr 中添加系列。
-- `Season`: 季度代码，一般为两位数字，如 `01`。
+- `Season`: 季度代码，网页端会从 Sonarr 获取所有季度，并显示其监视状态。
 - `Language`: 语言，为剧集对应语言的英文名，如 `Chinese`，需要符合系列所需的语言设定，否则无法被 Sonarr 抓取。
 - `Quality`: 质量，可用的值可以参考 [Sonarr 源码](https://github.com/Sonarr/Sonarr/blob/develop/src/NzbDrone.Core/Parser/QualityParser.cs) ，Sonarr 似乎不支持对 RSS 推送的项目自动检测质量，网页端默认填写的值为 `WEBDL 1080p`。
 
-在创建和编辑页面中，你可以在侧边栏中输入 Mikan Anime 的 RSS 推送地址，单击复制标题，以便快速填入 `Pattern` 字段：
+在创建和编辑页面中，侧边栏会自动根据 *Remote* 字段中的地址获取 RSS 推送中的项目，并高亮显示与模板所匹配的项目：
 
 ![Mikanarr 网页端截图](images/screenshot2.png)
 
@@ -72,6 +80,8 @@ $ yarn start
 
 再正确填入其他字段，你就完成了一条抓取模板的编辑。
 
+当然，更方便的方法是找到 Mikan Anime 上对应的 RSS 推送地址，填入 *Remote* 字段后，在侧边栏中选择所需的条目，即可完成前两步操作。
+
 ---
 
 为了获取变换后的的 RSS 推送，你可以将 Mikan Anime 的域名部分（`mikanani.me`）直接替换为 Mikanarr 部署的域名，比如从：
@@ -87,6 +97,8 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 ```
 
 将这一地址添加到 Sonarr 中，就能让他自动抓取你想要的剧集了，酷吧？
+
+如果你填入了 *Remote* 字段，也可以点击 *PROXY* 按钮一键拷贝。
 
 ## 其他
 
