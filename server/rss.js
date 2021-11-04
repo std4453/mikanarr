@@ -32,7 +32,7 @@ const route = async (req, res) => {
         torrent: [{ pubDate }],
       } = item;
       for (const { pattern, series, season, language, quality } of rules) {
-        const match = pattern.exec(title);
+        const match = Boolean(title.match(pattern));
         if (!match) continue;
         const { episode } = match.groups;
         const normalized = `${series} - S${season}E${episode} - ${language} - ${quality}`;

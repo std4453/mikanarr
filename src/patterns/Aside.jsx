@@ -64,10 +64,9 @@ const Aside = () => {
     }
   }, [patternString]);
   const matchedData = useMemo(() => {
-    console.log(data, patternRegex);
     return data.map((title) => ({
       title,
-      matched: Boolean(patternRegex?.exec(title)),
+      matched: patternRegex && Boolean(title.match(patternRegex)),
     }));
   }, [patternRegex, data]);
 
