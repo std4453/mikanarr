@@ -1,8 +1,8 @@
-import { Button, InputAdornment, makeStyles } from "@material-ui/core";
+import { Button, Grid, InputAdornment, makeStyles } from "@material-ui/core";
 import axios from "axios";
 import clsx from "clsx";
 import * as _ from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AutocompleteInput,
   Create,
@@ -16,6 +16,7 @@ import { useForm, useFormState } from "react-final-form";
 import useSWR from "swr";
 import { useClipboard } from "use-clipboard-copy";
 import Aside from "./Aside";
+import { BusProvider, useBus } from "./Bus";
 
 const EscapeButton = () => {
   const form = useForm();
@@ -102,10 +103,130 @@ const SeasonsInput = ({ series }) => {
   );
 };
 
-const PatternEdit = (props) => {
+const RefreshButton = () => {
+  const bus = useBus();
+
+  const onClick = useCallback(() => {
+    bus?.emit("refresh");
+  }, []);
+
+  return (
+    <Button color="primary" onClick={onClick}>
+      Refresh
+    </Button>
+  );
+};
+
+const ProxyButton = () => {
   const clipboard = useClipboard();
+  const state = useFormState();
+  const remote = state.values?.remote ?? "";
   const notify = useNotify();
 
+  return (
+    <Button
+      color="primary"
+      onClick={() => {
+        if (!remote) {
+          notify("No remote link to proxy");
+        } else {
+          const proxy = remote.replace(
+            "https://mikanani.me/",
+            process.env.REACT_APP_MIKANARR_PATH
+          );
+          clipboard.copy(proxy);
+          notify("Proxied RSS link copied");
+        }
+      }}
+    >
+      Proxy
+    </Button>
+  );
+};
+
+const RemoteInput = () => {
+  const state = useFormState();
+  const remote = state.values?.remote ?? "";
+  const bus = useBus();
+  const onFetch = useMemo(
+    () =>
+      _.debounce((remote) => {
+        bus?.setField("url", remote);
+      }, 1000),
+    [bus]
+  );
+  useEffect(() => {
+    onFetch(remote);
+  }, [remote, onFetch]);
+
+  return (
+    <TextInput
+      fullWidth
+      source="remote"
+      type="url"
+      InputProps={{
+        endAdornment: (
+          <>
+            <RefreshButton />
+            <ProxyButton />
+          </>
+        ),
+      }}
+    />
+  );
+};
+
+const PatternInput = () => {
+  const clipboard = useClipboard();
+  const notify = useNotify();
+  const form = useForm();
+
+  const bus = useBus();
+  useEffect(() => {
+    if (!bus) return;
+    const listener = (title) => {
+      form.change("pattern", _.escapeRegExp(title));
+      notify("Replaced pattern with selected item");
+    };
+    bus.on("item", listener);
+    return () => {
+      bus.off("item", listener);
+    };
+  }, [bus]);
+
+  const state = useFormState();
+  const pattern = state.values?.pattern ?? "";
+  useEffect(() => {
+    bus?.setField("pattern", pattern);
+  }, [pattern, bus]);
+
+  return (
+    <TextInput
+      multiline
+      fullWidth
+      source="pattern"
+      InputProps={{
+        endAdornment: (
+          <>
+            <EscapeButton />
+            <Button
+              color="primary"
+              onClick={() => {
+                clipboard.copy("(?<episode>\\d+)");
+                notify("Episode pattern copied");
+              }}
+            >
+              Episode
+            </Button>
+          </>
+        ),
+      }}
+      onBlur
+    />
+  );
+};
+
+const PatternEdit = (props) => {
   const series = useSeries();
   const choices = useMemo(
     () =>
@@ -117,35 +238,19 @@ const PatternEdit = (props) => {
   );
 
   return (
-    <Edit {...props} aside={<Aside />}>
-      <SimpleForm>
-        <TextInput disabled source="id" />
-        <TextInput
-          fullWidth
-          source="pattern"
-          InputProps={{
-            endAdornment: (
-              <>
-                <EscapeButton />
-                <Button
-                  color="primary"
-                  onClick={() => {
-                    clipboard.copy("(?<episode>\\d+)");
-                    notify("Episode pattern copied");
-                  }}
-                >
-                  Episode
-                </Button>
-              </>
-            ),
-          }}
-        />
-        <AutocompleteInput fullWidth source="series" choices={choices} />
-        <SeasonsInput series={series} />
-        <TextInput source="language" />
-        <TextInput source="quality" />
-      </SimpleForm>
-    </Edit>
+    <BusProvider>
+      <Edit {...props} aside={<Aside />}>
+        <SimpleForm>
+          <TextInput disabled source="id" />
+          <RemoteInput />
+          <PatternInput />
+          <AutocompleteInput fullWidth source="series" choices={choices} />
+          <SeasonsInput series={series} />
+          <TextInput source="language" />
+          <TextInput source="quality" />
+        </SimpleForm>
+      </Edit>
+    </BusProvider>
   );
 };
 
@@ -155,8 +260,6 @@ const patternDefaultValue = () => ({
 });
 
 const PatternCreate = (props) => {
-  const clipboard = useClipboard();
-  const notify = useNotify();
   const series = useSeries();
   const choices = useMemo(
     () =>
@@ -166,36 +269,21 @@ const PatternCreate = (props) => {
       })),
     [series]
   );
+
   return (
-    <Create {...props} aside={<Aside />}>
-      <SimpleForm initialValues={patternDefaultValue}>
-        <TextInput disabled source="id" />
-        <TextInput
-          fullWidth
-          source="pattern"
-          InputProps={{
-            endAdornment: (
-              <>
-                <EscapeButton />
-                <Button
-                  color="primary"
-                  onClick={() => {
-                    clipboard.copy("(?<episode>\\d+)");
-                    notify("Episode pattern copied");
-                  }}
-                >
-                  Episode
-                </Button>
-              </>
-            ),
-          }}
-        />
-        <AutocompleteInput fullWidth source="series" choices={choices} />
-        <TextInput source="season" />
-        <TextInput source="language" />
-        <TextInput source="quality" />
-      </SimpleForm>
-    </Create>
+    <BusProvider>
+      <Create {...props} aside={<Aside />}>
+        <SimpleForm initialValues={patternDefaultValue}>
+          <TextInput disabled source="id" />
+          <RemoteInput />
+          <PatternInput />
+          <AutocompleteInput fullWidth source="series" choices={choices} />
+          <TextInput source="season" />
+          <TextInput source="language" />
+          <TextInput source="quality" />
+        </SimpleForm>
+      </Create>
+    </BusProvider>
   );
 };
 

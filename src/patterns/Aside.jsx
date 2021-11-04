@@ -1,21 +1,20 @@
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import {
-  Grid,
-  Button,
   Card,
   CardContent,
-  TextField,
   List,
   ListItem,
   ListItemText,
+  CircularProgress,
+  Typography,
+  makeStyles,
 } from "@material-ui/core";
-import useSWR from "swr";
 import axios from "axios";
-import { useClipboard } from "use-clipboard-copy";
+import _ from "lodash";
 import { useNotify } from "ra-core";
-import { Autocomplete } from "@material-ui/lab";
-import store from "store";
+import { useEffect, useMemo } from "react";
+import useSWR from "swr";
+import { useBus, useBusField } from "./Bus";
+import clsx from "clsx";
 
 const fetcher = async (url) => {
   // use a proxy to bypass CORS
@@ -25,92 +24,122 @@ const fetcher = async (url) => {
   return data;
 };
 
+const useStyles = makeStyles((theme) => ({
+  matched: {
+    color: theme.palette.primary.main,
+  },
+}));
+
 const Aside = () => {
-  const [history, setHistory] = useState(store.get("url_history") ?? []);
-  const { control, handleSubmit } = useForm();
-  const [url, setUrl] = useState(null);
-  const clipboard = useClipboard();
   const notify = useNotify();
-  const { data, revalidate } = useSWR(url, fetcher, {
+  const bus = useBus();
+
+  const url = useBusField("url");
+
+  const { data, mutate, isValidating } = useSWR(url, fetcher, {
+    fallbackData: [],
     onError: (e, url) => {
       notify(`Unable to fetch proxy for '${url}': ${e.message}`);
     },
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
-  const onSubmit = (data) => {
-    setUrl(data.url);
-    let newHistory = history.filter((url) => url !== data.url);
-    newHistory.push(data.url);
-    newHistory = newHistory.slice(0, 20); // keep only 20 entries
-    setHistory(newHistory);
-    store.set("url_history", newHistory);
-  };
+
+  useEffect(() => {
+    if (!bus) return;
+    const listener = () => mutate(undefined, true);
+    bus.on("refresh", listener);
+    return () => {
+      bus.off("refresh", listener);
+    };
+  }, [bus, mutate]);
+
+  const patternString = useBusField("pattern") ?? "";
+  const patternRegex = useMemo(() => {
+    try {
+      return new RegExp(`^${patternString}$`, "g");
+    } catch (e) {
+      // invalid regex
+      return null;
+    }
+  }, [patternString]);
+  const matchedData = useMemo(() => {
+    console.log(data, patternRegex);
+    return data.map((title) => ({
+      title,
+      matched: Boolean(patternRegex?.exec(title)),
+    }));
+  }, [patternRegex, data]);
+
+  const styles = useStyles();
 
   return (
     <Card style={{ marginLeft: 20 }}>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container direction="column" spacing={1}>
-            <Grid item container direction="row" spacing={1}>
-              <Grid item xs>
-                <Controller
-                  name="url"
-                  control={control}
-                  defaultValue=""
-                  render={({
-                    field: { value, name, ref, onBlur, onChange },
-                  }) => (
-                    <Autocomplete
-                      freeSolo
-                      name={name}
-                      ref={ref}
-                      onBlur={onBlur}
-                      inputValue={value}
-                      onInputChange={(event, value) =>
-                        onChange({ target: { value } })
-                      }
-                      options={history}
-                      renderInput={(params) => (
-                        <TextField fullWidth placeholder="URL" {...params} />
-                      )}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item>
-                <Button type="submit" color="primary">
-                  Fetch
-                </Button>
-              </Grid>
-            </Grid>
-            <Grid
-              item
+      <CardContent style={{ height: "75vh", position: "relative" }}>
+        <div
+          style={{
+            position: "relative",
+            width: 400,
+            height: "100%",
+            overflow: "auto",
+          }}
+        >
+          {matchedData.length > 0 ? (
+            <List>
+              {matchedData.map(({ title, matched }, i) => (
+                <ListItem
+                  button
+                  key={i}
+                  dense
+                  disableGutters
+                  divider
+                  onClick={() => {
+                    bus?.emit("item", title);
+                  }}
+                >
+                  <ListItemText
+                    primary={title}
+                    className={clsx({
+                      [styles.matched]: matched,
+                    })}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <div
               style={{
-                position: "relative",
-                width: 400,
-                maxHeight: "80vh",
-                overflow: "auto",
+                position: "absolute",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                left: 0,
+                top: 0,
+                right: 0,
+                height: "100%",
               }}
             >
-              <List>
-                {(data ?? []).map((title, i) => (
-                  <ListItem
-                    button
-                    key={i}
-                    dense
-                    disableGutters
-                    divider
-                    onClick={() => {
-                      clipboard.copy(title);
-                      notify("Title copied");
-                    }}
-                  >
-                    <ListItemText primary={title} />
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
-          </Grid>
-        </form>
+              <Typography>Enter RSS URL to fetch</Typography>
+            </div>
+          )}
+        </div>
+        {isValidating && (
+          <div
+            style={{
+              position: "absolute",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              left: 0,
+              top: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
