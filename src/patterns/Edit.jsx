@@ -135,8 +135,8 @@ const ProxyButton = () => {
           notify("No remote link to proxy");
         } else {
           const proxy = remote.replace(
-            "https://mikanani.me/",
-            process.env.REACT_APP_MIKANARR_PATH
+            "https://mikanani.me",
+            `${location.protocol}//${location.host}`
           );
           clipboard.copy(proxy);
           notify("Proxied RSS link copied");

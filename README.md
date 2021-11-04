@@ -23,12 +23,9 @@
 ```env
 SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
 SONARR_API_ROOT=https://sonarr.yourdomain.com/api
-REACT_APP_MIKANARR_PATH=https://your_mikanarr_host/
 ADMIN_USERNAME=mikanarr
 ADMIN_PASSWORD=your_admin_password
 ```
-
-这里的 `REACT_APP_MIKANARR_PATH` 应当填写你实际的部署地址，用于生成本地 RSS feed 的地址。
 
 `ADMIN_USERNAME` 和 `ADMIN_PASSWORD` 用于登陆系统，未登陆无法访问。
 
