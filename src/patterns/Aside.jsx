@@ -57,7 +57,7 @@ const Aside = () => {
   const patternString = useBusField("pattern") ?? "";
   const patternRegex = useMemo(() => {
     try {
-      return new RegExp(`^${patternString}$`, "g");
+      return new RegExp(`^${patternString}$`);
     } catch (e) {
       // invalid regex
       return null;

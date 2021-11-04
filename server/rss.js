@@ -19,7 +19,7 @@ const route = async (req, res) => {
     // pre-compile
     const database = db.get("patterns").value();
     const rules = database.map(({ pattern, ...rest }) => ({
-      pattern: new RegExp(pattern, "g"),
+      pattern: new RegExp(`^${pattern}$`),
       ...rest,
     }));
 
@@ -32,8 +32,8 @@ const route = async (req, res) => {
         torrent: [{ pubDate }],
       } = item;
       for (const { pattern, series, season, language, quality } of rules) {
-        const match = Boolean(title.match(pattern));
-        if (!match) continue;
+        const match = title.match(pattern);
+        if (!match?.groups?.episode) continue;
         const { episode } = match.groups;
         const normalized = `${series} - S${season}E${episode} - ${language} - ${quality}`;
         items.push({
