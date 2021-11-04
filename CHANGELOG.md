@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.2] - 2021.11.04
+
+### Changed 更改
+
+- 修复正则表达式匹配的逻辑错误
+
 ## [1.1.1] - 2021.11.04
 
 ### Changed 更改
