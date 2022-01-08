@@ -22,12 +22,19 @@
 
 ```env
 SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
-SONARR_API_ROOT=https://sonarr.yourdomain.com/api
+SONARR_HOST=https://sonarr.yourdomain.com
 ADMIN_USERNAME=mikanarr
 ADMIN_PASSWORD=your_admin_password
 ```
 
 `ADMIN_USERNAME` 和 `ADMIN_PASSWORD` 用于登陆系统，未登陆无法访问。
+
+然后在data目录创建jwk key
+
+```bash
+ssh-keygen -t rsa -b 4096 -E SHA512 -m PEM -f jwt.key
+openssl rsa -in jwt.key -pubout -outform PEM -out jwt.key.pub
+```
 
 然后运行（需要 Node.js 环境）：
 
@@ -101,25 +108,27 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 
 ### 部署
 
-你可以使用 [Docker](https://www.docker.com/) 进行部署，我们的 Docker Image 在 [`std4453/mikanarr`](https://hub.docker.com/r/std4453/mikanarr) 。
+你可以使用 [Docker](https://www.docker.com/) 进行部署，我们的 Docker Image 在 [`izumiko/mikanarr`](https://hub.docker.com/r/izumiko/mikanarr) 。
 
-你也可以使用 [`build_docker.sh`](build_docker.sh) 自行构建 Docker Image。
+构建得到的镜像不包含 `.env` 文件，你需要把它放入下面的 `data/` 文件夹。
 
-构建得到的镜像不包含 `.env` 文件，你需要在 `docker run` 的时候指定对应的环境变量。
-
-此外，数据文件不应包含在 Docker Image 和 Docker Container 中，你应当从宿主机将数据文件夹 `data/` 挂载到容器中的 `/usr/app/data` 。
+此外，数据文件不应包含在 Docker Image 和 Docker Container 中，你应当从宿主机将数据文件夹 `data/` 挂载到容器中的 `/data` 。
 
 如果你使用 `docker-compose` ，这里有一份 `docker-compose.yml` 模板：
 
 ```yaml
-version: "3.9"
+version: "3"
 
 services:
   mikanarr:
-    image: std4453/mikanarr
+    image: izumiko/mikanarr
     volumes:
-      - ./data:/usr/src/app/data
-    env_file: .env
+      - /path/on/host/data:/data
+    environment:
+      - PUID=1000
+      - PGID=100
+    expose:
+      - 12306/tcp
     restart: unless-stopped
 ```
 
