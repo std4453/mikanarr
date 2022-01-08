@@ -6,8 +6,8 @@ import {
   ListItemText,
   CircularProgress,
   Typography,
-  makeStyles,
-} from "@material-ui/core";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import axios from "axios";
 import _ from "lodash";
 import { useNotify } from "ra-core";
@@ -26,7 +26,7 @@ const fetcher = async (url) => {
 
 const useStyles = makeStyles((theme) => ({
   matched: {
-    color: theme.palette.primary.main,
+    color: '#1976d2',
   },
 }));
 

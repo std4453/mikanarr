@@ -16,22 +16,23 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@material-ui/core": "4.11.4",
-    "@material-ui/lab": "4.0.0-alpha.57",
-    "axios": "^0.21.1",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.2.7",
+    "@mui/styles": "^5.2.3",
+    "axios": "^0.24.0",
     "clsx": "^1.1.1",
     "dotenv-cli": "^4.0.0",
     "express": "^4.17.1",
     "express-jwt": "^6.1.0",
-    "global-agent": "^2.2.0",
-    "http-proxy-middleware": "^1.2.0",
-    "json-server": "^0.16.3",
+    "global-agent": "^3.0.0",
+    "http-proxy-middleware": "^2.0.1",
+    "json-server": "^0.17.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "lowdb": "^1.0.0",
     "qs": "^6.10.1",
     "ra-data-json-server": "^3.14.4",
-    "ra-ui-materialui": "^3.18.1",
     "react": "^17.0.2",
     "react-admin": "^3.14.4",
     "react-dom": "^17.0.2",
@@ -48,7 +49,7 @@
     "react-scripts": "^4.0.3"
   },
   "resolutions": {
-    "react-admin/@material-ui/core": "4.11.4"
+    "react-admin/@material-ui/core": "^4.11.4"
   },
   "browserslist": {
     "production": [
