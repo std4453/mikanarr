@@ -1,11 +1,20 @@
-FROM node:14
-WORKDIR /usr/src/app
+FROM node:16 AS builder
+WORKDIR /
 
 COPY package.json ./
 COPY yarn.lock ./
-RUN yarn install --production=true
-COPY build ./build
+COPY public ./public
 COPY server ./server
+COPY src ./src
+RUN yarn install
+RUN yarn build
+RUN chmod 755 ./index-*
+
+FROM alpine:latest 
+RUN apk --no-cache add ca-certificates
+WORKDIR /
+COPY --from=builder /build ./build
+COPY --from=builder /index-alpine ./index
 EXPOSE 12306
-VOLUME /usr/src/app/data
-CMD ["yarn", "start"]
+VOLUME /data
+CMD ["./index"]
