@@ -1,5 +1,7 @@
 # Mikanarr
 
+[![CircleCI](https://circleci.com/gh/std4453/mikanarr/tree/master.svg?style=svg)](https://circleci.com/gh/std4453/mikanarr/tree/master)
+
 *Mikanarr* 由 *Mikan Anime* 与 *Sonarr* 混合而成，负责打通两者之间的桥梁，作为自动下载动画的关键一步存在。
 
 关于整个媒体栈的详细信息，请参考 [我的博客](https://blog.std4453.com:444/nas-from-zero-media-part/) ，本文件仅阐述项目的使用方法。
@@ -21,7 +23,11 @@
 ```env
 SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
 SONARR_HOST=https://sonarr.yourdomain.com/
+ADMIN_USERNAME=mikanarr
+ADMIN_PASSWORD=your_admin_password
 ```
+
+`ADMIN_USERNAME` 和 `ADMIN_PASSWORD` 用于登陆系统，未登陆无法访问。
 
 然后运行（需要 Node.js 环境）：
 
@@ -36,15 +42,17 @@ $ yarn start
 
 ![Mikanarr 网页端截图](images/screenshot1.png)
 
-在网页中，你可以添加、删除、编辑条目，主要需要填写的字段包括：
+在网页中，你可以搜索、排序、添加、删除、编辑条目，主要需要填写的字段包括：
 
+- `Remote`: 远程地址，即 Mikan Anime 中对应剧集 （可以包含字幕组） 的 RSS 推送地址，选填。
 - `Pattern`: 标题模板，只有匹配至少一条的项目会被返回，模板本身为 [正则表达式](https://en.wikipedia.org/wiki/Regular_expression) ，表达式中需要包含 [命名捕获组](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Groups_and_Ranges) （即 `(?<episode>\d+)` )，用于提供剧集信息。
 - `Series`: 系列名称，网页端会从 Sonarr 获取所有系列名称，如果没有找到需要的系列，可能需要首先在 Sonarr 中添加系列。
-- `Season`: 季度代码，一般为两位数字，如 `01`。
+- `Season`: 季度代码，网页端会从 Sonarr 获取所有季度，并显示其监视状态。
+- `Offset`: 剧集号偏移量，用于修复从第一季开始的序号和从本季开始的序号。如`-26`。
 - `Language`: 语言，为剧集对应语言的英文名，如 `Chinese`，需要符合系列所需的语言设定，否则无法被 Sonarr 抓取。
 - `Quality`: 质量，可用的值可以参考 [Sonarr 源码](https://github.com/Sonarr/Sonarr/blob/develop/src/NzbDrone.Core/Parser/QualityParser.cs) ，Sonarr 似乎不支持对 RSS 推送的项目自动检测质量，网页端默认填写的值为 `WEBDL 1080p`。
 
-在创建和编辑页面中，你可以在侧边栏中输入 Mikan Anime 的 RSS 推送地址，单击复制标题，以便快速填入 `Pattern` 字段：
+在创建和编辑页面中，侧边栏会自动根据 *Remote* 字段中的地址获取 RSS 推送中的项目，并高亮显示与模板所匹配的项目：
 
 ![Mikanarr 网页端截图](images/screenshot2.png)
 
@@ -70,6 +78,8 @@ $ yarn start
 
 再正确填入其他字段，你就完成了一条抓取模板的编辑。
 
+当然，更方便的方法是找到 Mikan Anime 上对应的 RSS 推送地址，填入 *Remote* 字段后，在侧边栏中选择所需的条目，即可完成前两步操作。
+
 ---
 
 为了获取变换后的的 RSS 推送，你可以将 Mikan Anime 的域名部分（`mikanani.me`）直接替换为 Mikanarr 部署的域名，比如从：
@@ -86,6 +96,8 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 
 将这一地址添加到 Sonarr 中，就能让他自动抓取你想要的剧集了，酷吧？
 
+如果你填入了 *Remote* 字段，也可以点击 *PROXY* 按钮一键拷贝。
+
 ## 其他
 
 ### 部署
@@ -93,8 +105,6 @@ https://<Mikanarr域名>/RSS/MyBangumi?token=<你的个人Token>
 你可以使用 [Docker](https://www.docker.com/) 进行部署，我们的 Docker Image 在 [`std4453/mikanarr`](https://hub.docker.com/r/std4453/mikanarr) 。
 
 你也可以使用 [`build_docker.sh`](build_docker.sh) 自行构建 Docker Image。
-
-注意，为了在中国网络环境中进行构建，我们的 `yarn.lock` 中使用 [淘宝 npm 镜像](https://npm.taobao.org/mirrors/) 作为包的地址，你可能需要使用其他的镜像。
 
 构建得到的镜像不包含 `.env` 文件，你需要在 `docker run` 的时候指定对应的环境变量。
 
@@ -107,7 +117,7 @@ version: "3.9"
 
 services:
   mikanarr:
-    image: <your scope>/mikanarr
+    image: std4453/mikanarr
     volumes:
       - ./data:/usr/src/app/data
     env_file: .env
