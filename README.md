@@ -22,7 +22,7 @@
 
 ```env
 SONARR_API_KEY=aaaabbbbccccddddeeeeffff1145141919810
-SONARR_API_ROOT=https://sonarr.yourdomain.com/api
+SONARR_HOST=https://sonarr.yourdomain.com/
 ADMIN_USERNAME=mikanarr
 ADMIN_PASSWORD=your_admin_password
 ```
