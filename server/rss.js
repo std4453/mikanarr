@@ -31,7 +31,7 @@ const route = async (req, res) => {
         link,
         torrent: [{ pubDate }],
       } = item;
-      for (const { pattern, series, season, language, quality } of rules) {
+      for (const { pattern, series, season, language, quality, offset } of rules) {
         const match = title.match(pattern);
         if (!match?.groups?.episode) continue;
         const { episode } = match.groups;
