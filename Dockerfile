@@ -6,7 +6,7 @@ COPY yarn.lock ./
 COPY public ./public
 COPY server ./server
 COPY src ./src
-RUN yarn install
+RUN yarn --frozen-lockfile
 RUN yarn build
 RUN chmod 755 ./index-*
 
