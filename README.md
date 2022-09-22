@@ -29,6 +29,8 @@ ADMIN_PASSWORD=your_admin_password
 
 `ADMIN_USERNAME` 和 `ADMIN_PASSWORD` 用于登陆系统，未登陆无法访问。
 
+如果你已通过反向代理添加了认证能力，可以通过增加环境变量 `DISABLE_AUTH=true` 来禁用内置的基于 JWT 的用户认证。
+
 然后运行（需要 Node.js 环境）：
 
 ```bash

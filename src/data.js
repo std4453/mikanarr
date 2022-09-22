@@ -5,7 +5,9 @@ const httpClient = (url, options = {}) => {
     if (!options.headers) {
         options.headers = new Headers();
     }
-    options.headers.set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+    if (localStorage.getItem('token')) {
+        options.headers.set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+    }
     return fetchUtils.fetchJson(url, options);
 };
 

@@ -1,3 +1,8 @@
+if (process.env.DISABLE_AUTH === 'true') {
+  module.exports = [];
+  return;
+}
+
 const server = require('./server');
 
 const fs = require('fs');
