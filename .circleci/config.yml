@@ -5,17 +5,11 @@ jobs:
       IMAGE_NAME: std4453/mikanarr
       IMAGE_VERSION: 1.1.3
     docker:
-      - image: circleci/node:15.9.0
+      - image: cimg/node:lts
     steps:
       - checkout
       - setup_remote_docker:
           version: 19.03.13
-      - run:
-          name: Instal Dependencies
-          command: yarn --frozen-lockfile
-      - run:
-          name: Build Code
-          command: yarn build
       - run:
           name: Build Docker image
           command: |
