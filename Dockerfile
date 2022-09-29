@@ -12,9 +12,9 @@ RUN chmod 755 ./index-*
 
 FROM alpine:latest 
 RUN apk --no-cache add ca-certificates
-WORKDIR /
+WORKDIR /usr/src/app
 COPY --from=builder /build ./build
 COPY --from=builder /index-alpine ./mikanarr
 EXPOSE 12306
-VOLUME /data
+VOLUME /usr/src/app/data
 CMD ["./mikanarr"]
